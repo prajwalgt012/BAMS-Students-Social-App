@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Quiz - BAMS Social App</title>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { color: #007bff; }
+    .option { margin: 8px 0; }
+    button { padding: 10px 15px; margin-top: 10px; }
+    .leaderboard { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+<h2>🧠 Daily Quiz</h2>
+
+<div id="quizContainer">
+  <p><strong id="question">Loading question...</strong></p>
+  <div id="options"></div>
+  <button onclick="submitAnswer()">Submit Answer</button>
+</div>
+
+<div class="leaderboard">
+  <h2>🏆 Leaderboard</h2>
+  <ul id="leaderboardList"></ul>
+</div>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+    authDomain: "bams-social-app.firebaseapp.com",
+    projectId: "bams-social-app",
+    storageBucket: "bams-social-app.firebasestorage.app",
+    messagingSenderId: "542183068748",
+    appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+    measurementId: "G-40MHQ4M0X5"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let correctAnswer = "";
+  let currentUser = "Student_" + Math.floor(Math.random() * 10000); // use Firebase Auth in future
+
+  // Load Daily Question
+  db.collection("quiz").orderBy("date", "desc").limit(1).get().then(snapshot => {
+    if (!snapshot.empty) {
+      const quiz = snapshot.docs[0].data();
+      correctAnswer = quiz.answer;
+      document.getElementById("question").innerText = quiz.question;
+      const optionsDiv = document.getElementById("options");
+      quiz.options.forEach(option => {
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "quizOption";
+        radio.value = option;
+        radio.className = "option";
+        optionsDiv.appendChild(radio);
+        optionsDiv.appendChild(document.createTextNode(option));
+        optionsDiv.appendChild(document.createElement("br"));
+      });
+    }
+  });
+
+  // Submit Answer
+  function submitAnswer() {
+    const selected = document.querySelector('input[name="quizOption"]:checked');
+    if (!selected) return alert("Please choose an option");
+    const isCorrect = selected.value === correctAnswer;
+
+    db.collection("scores").doc(currentUser).get().then(doc => {
+      let score = doc.exists ? doc.data().score : 0;
+      if (isCorrect) score += 1;
+
+      db.collection("scores").doc(currentUser).set({ name: currentUser, score });
+      alert(isCorrect ? "✅ Correct!" : "❌ Wrong! Correct: " + correctAnswer);
+    });
+  }
+
+  // Leaderboard
+  db.collection("scores").orderBy("score", "desc").limit(10).onSnapshot(snapshot => {
+    const list = document.getElementById("leaderboardList");
+    list.innerHTML = "";
+    snapshot.forEach(doc => {
+      const user = doc.data();
+      const li = document.createElement("li");
+      li.innerText = `${user.name}: ${user.score}`;
+      list.appendChild(li);
+    });
+  });
+</script>
+
+</body>
+</html>
