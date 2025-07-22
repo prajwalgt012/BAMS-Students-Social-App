@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Community Chat - BAMS Social App</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #messages { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .message { margin-bottom: 10px; }
+    .message strong { color: #2e7d32; }
+  </style>
+</head>
+<body>
+  <h2>💬 Community Chat</h2>
+  <button onclick="logout()">Logout</button>
+  <div id="messages"></div>
+
+  <input type="text" id="messageInput" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+      authDomain: "bams-social-app.firebaseapp.com",
+      projectId: "bams-social-app",
+      storageBucket: "bams-social-app.firebasestorage.app",
+      messagingSenderId: "542183068748",
+      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+      measurementId: "G-40MHQ4M0X5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser;
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        currentUser = user;
+        listenToMessages();
+      }
+    });
+
+    function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      db.collection("chatMessages").add({
+        user: currentUser.email,
+        message: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      input.value = "";
+    }
+
+    function listenToMessages() {
+      db.collection("chatMessages").orderBy("timestamp", "asc")
+        .onSnapshot(snapshot => {
+          const messagesDiv = document.getElementById("messages");
+          messagesDiv.innerHTML = "";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.timestamp?.toDate().toLocaleString() || "sending...";
+            messagesDiv.innerHTML += `
+              <div class="message">
+                <strong>${data.user}</strong>: ${data.message} <br>
+                <small>${date}</small>
+              </div>
+            `;
+          });
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+    }
+
+    function logout() {
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
+  </script>
+</body>
+</html>
