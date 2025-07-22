@@ -1,43 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>BAMS Social App - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 16px;
       text-align: center;
-      padding: 50px;
-      background: linear-gradient(to bottom, #e0ffe0, #ffffff);
+      max-width: 400px;
     }
     h1 {
-      color: #2e7d32;
+      margin-bottom: 30px;
+      font-size: 2rem;
     }
-    button {
+    #loginBtn {
+      background-color: white;
+      color: #2575fc;
       padding: 12px 24px;
-      font-size: 16px;
-      background-color: #2e7d32;
-      color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
+      transition: 0.3s;
     }
-    button:hover {
-      background-color: #1b5e20;
+    #loginBtn:hover {
+      background-color: #f1f1f1;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to BAMS Social App</h1>
-  <p>Connect, Compete & Celebrate Ayurveda!</p>
-  <button onclick="login()">Login with Google</button>
 
-  <!-- Firebase SDK -->
+  <div class="container">
+    <h1>Welcome to BAMS Social App</h1>
+    <button id="loginBtn">Sign in with Google</button>
+  </div>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
       authDomain: "bams-social-app.firebaseapp.com",
@@ -48,19 +65,20 @@
       measurementId: "G-40MHQ4M0X5"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
-    function login() {
+    document.getElementById("loginBtn").addEventListener("click", function () {
       const provider = new firebase.auth.GoogleAuthProvider();
       firebase.auth().signInWithPopup(provider)
         .then((result) => {
-          localStorage.setItem("bamsUser", JSON.stringify(result.user));
+          localStorage.setItem("user", JSON.stringify(result.user));
           window.location.href = "dashboard.html";
         })
         .catch((error) => {
           alert("Login failed: " + error.message);
         });
-    }
+    });
   </script>
 </body>
 </html>
