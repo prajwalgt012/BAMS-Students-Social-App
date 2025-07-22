@@ -1,16 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Daily Quiz - BAMS Social App</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <title>Daily Quiz | BAMS Social</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #56ccf2, #2f80ed);
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: rgba(0,0,0,0.2);
+      padding: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      width: 100%;
+      text-align: center;
+    }
+
+    .container {
+      background: white;
+      color: #333;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .option {
+      margin: 10px 0;
+    }
+
+    .option input {
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #2f80ed;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>🧠 Daily Quiz</h1>
-  <button onclick="logout()">Logout</button>
 
-  <div id="quizBox"></div>
+  <header>🧠 Daily Quiz - BAMS Social App</header>
+
+  <div class="container" id="quizContainer">
+    <p>Loading today's quiz...</p>
+  </div>
 
   <script>
     // Firebase config
@@ -28,7 +91,8 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentUser;
+    let currentUser = null;
+    const quizContainer = document.getElementById("quizContainer");
 
     auth.onAuthStateChanged(user => {
       if (!user) {
@@ -40,52 +104,55 @@
     });
 
     function loadQuiz() {
-      const today = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0];
 
       db.collection("dailyQuizzes").doc(today).get().then(doc => {
         if (!doc.exists) {
-          document.getElementById("quizBox").innerHTML = "No quiz for today.";
+          quizContainer.innerHTML = "<p>No quiz found for today. Please check back tomorrow.</p>";
           return;
         }
 
-        const data = doc.data();
-        let optionsHTML = "";
-        data.options.forEach((opt, idx) => {
-          optionsHTML += `
-            <div>
-              <input type="radio" name="option" value="${idx}" id="opt${idx}">
-              <label for="opt${idx}">${opt}</label>
+        const quiz = doc.data();
+        let html = `<h2>${quiz.question}</h2><form id="quizForm">`;
+
+        quiz.options.forEach((opt, index) => {
+          html += `
+            <div class="option">
+              <input type="radio" name="option" value="${index}" id="opt${index}">
+              <label for="opt${index}">${opt}</label>
             </div>`;
         });
 
-        document.getElementById("quizBox").innerHTML = `
-          <h2>${data.question}</h2>
-          ${optionsHTML}
-          <button onclick="submitAnswer('${today}', ${data.correctAnswer})">Submit Answer</button>
-        `;
+        html += `<button type="button" onclick="submitQuiz('${today}', ${quiz.correctAnswer})">Submit</button>`;
+        html += `<div id="result"></div></form>`;
+
+        quizContainer.innerHTML = html;
       });
     }
 
-    function submitAnswer(date, correctAnswer) {
+    function submitQuiz(date, correctAnswer) {
       const selected = document.querySelector('input[name="option"]:checked');
-      if (!selected) return alert("Please choose an option");
+      const resultDiv = document.getElementById("result");
 
-      const userAnswer = parseInt(selected.value);
-      const isCorrect = userAnswer === correctAnswer;
+      if (!selected) {
+        resultDiv.innerHTML = "❗ Please select an option.";
+        resultDiv.style.color = "red";
+        return;
+      }
+
+      const answer = parseInt(selected.value);
+      const isCorrect = answer === correctAnswer;
 
       db.collection("quizResponses").add({
         user: currentUser.email,
         date: date,
-        answer: userAnswer,
+        answer: answer,
         isCorrect: isCorrect,
         submittedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      alert(isCorrect ? "✅ Correct Answer!" : "❌ Wrong Answer");
-    }
-
-    function logout() {
-      auth.signOut().then(() => window.location.href = "index.html");
+      resultDiv.innerHTML = isCorrect ? "✅ Correct Answer!" : "❌ Wrong Answer.";
+      resultDiv.style.color = isCorrect ? "green" : "red";
     }
   </script>
 </body>
