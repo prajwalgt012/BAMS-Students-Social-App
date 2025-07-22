@@ -1,184 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Entertainment | BAMS Social</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entertainment - BAMS</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
       margin: 0;
       padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
 
     header {
-      background-color: #6200ea;
-      color: white;
-      padding: 15px 20px;
+      width: 100%;
+      padding: 20px;
+      background: white;
+      border-bottom: 1px solid #ddd;
       text-align: center;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: bold;
+      color: #262626;
     }
 
     .container {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .post-box {
-      background-color: #fff;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      border-radius: 8px;
-    }
-
-    textarea {
       width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      resize: vertical;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      max-width: 800px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
     }
 
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #6200ea;
-      color: white;
-      border: none;
-      border-radius: 6px;
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 18px;
+      color: #262626;
       cursor: pointer;
+      transition: 0.3s ease;
     }
 
-    .post {
-      background-color: #fff;
-      padding: 12px 15px;
-      border-radius: 6px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    .card:hover {
+      background: #f1f1f1;
     }
 
-    .post-author {
-      font-weight: bold;
-      color: #333;
-    }
-
-    .post-content {
-      margin-top: 5px;
-    }
-
-    #signInBtn, #signOutBtn {
-      margin-bottom: 20px;
-    }
-
-    .user-info {
+    .emoji {
+      font-size: 32px;
+      display: block;
       margin-bottom: 10px;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 15px;
+      text-align: center;
       font-size: 14px;
+      color: #999;
     }
   </style>
 </head>
 <body>
-  <header>🎭 Entertainment Zone - BAMS Social</header>
+
+  <header>🎭 Entertainment</header>
+
   <div class="container">
-    <div id="authSection">
-      <button id="signInBtn">Sign in with Google</button>
+    <div class="card" onclick="alert('Coming soon: Funny memes!')">
+      <span class="emoji">😂</span>
+      Memes
     </div>
-    <div class="user-info" id="userInfo"></div>
-    <div id="postSection" style="display:none;">
-      <div class="post-box">
-        <textarea id="postContent" rows="4" placeholder="Share a meme, joke, or fun thought..."></textarea>
-        <button onclick="postFun()">Post</button>
-        <button id="signOutBtn">Sign Out</button>
-      </div>
-      <div id="postList"></div>
+    <div class="card" onclick="alert('Coming soon: Short videos!')">
+      <span class="emoji">🎬</span>
+      Short Videos
+    </div>
+    <div class="card" onclick="alert('Coming soon: Jokes!')">
+      <span class="emoji">😜</span>
+      Jokes
+    </div>
+    <div class="card" onclick="alert('Coming soon: Motivational reels!')">
+      <span class="emoji">💪</span>
+      Motivation
+    </div>
+    <div class="card" onclick="alert('Coming soon: Romantic posts!')">
+      <span class="emoji">❤️</span>
+      Love Posts
+    </div>
+    <div class="card" onclick="alert('Coming soon: Health tips!')">
+      <span class="emoji">🩺</span>
+      Health Tips
     </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
-      authDomain: "bams-social-app.firebaseapp.com",
-      projectId: "bams-social-app",
-      storageBucket: "bams-social-app.firebasestorage.app",
-      messagingSenderId: "542183068748",
-      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
-      measurementId: "G-40MHQ4M0X5"
-    };
+  <footer>© 2025 BAMS Social App</footer>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const signInBtn = document.getElementById("signInBtn");
-    const signOutBtn = document.getElementById("signOutBtn");
-    const authSection = document.getElementById("authSection");
-    const postSection = document.getElementById("postSection");
-    const userInfo = document.getElementById("userInfo");
-    let currentUser = null;
-
-    signInBtn.onclick = () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider);
-    };
-
-    signOutBtn.onclick = () => {
-      auth.signOut();
-    };
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        authSection.style.display = "none";
-        postSection.style.display = "block";
-        userInfo.innerText = `Signed in as ${user.displayName}`;
-        loadPosts();
-      } else {
-        currentUser = null;
-        authSection.style.display = "block";
-        postSection.style.display = "none";
-        userInfo.innerText = "";
-      }
-    });
-
-    function postFun() {
-      const content = document.getElementById("postContent").value.trim();
-      if (!content) return alert("Post cannot be empty!");
-
-      db.collection("entertainmentPosts").add({
-        content: content,
-        author: currentUser.displayName,
-        uid: currentUser.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        document.getElementById("postContent").value = "";
-        loadPosts();
-      });
-    }
-
-    function loadPosts() {
-      const postList = document.getElementById("postList");
-      postList.innerHTML = "";
-      db.collection("entertainmentPosts").orderBy("createdAt", "desc").limit(50).get()
-        .then(snapshot => {
-          snapshot.forEach(doc => {
-            const post = doc.data();
-            const div = document.createElement("div");
-            div.className = "post";
-            div.innerHTML = `
-              <div class="post-author">👤 ${post.author}</div>
-              <div class="post-content">${post.content}</div>
-            `;
-            postList.appendChild(div);
-          });
-        });
-    }
-  </script>
 </body>
 </html>
