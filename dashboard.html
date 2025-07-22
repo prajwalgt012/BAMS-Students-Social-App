@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BAMS Social App - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f0fff0;
+    }
+    .profile-pic {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+    h2 {
+      color: #2e7d32;
+    }
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Welcome to BAMS Social App</h2>
+  <img id="user-photo" class="profile-pic" src="" alt="User Photo" />
+  <p id="user-name"></p>
+
+  <button onclick="goTo('entertainment.html')">🎬 Entertainment</button>
+  <button onclick="goTo('competition.html')">🏆 Competition</button>
+  <button onclick="logout()">🚪 Logout</button>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+      authDomain: "bams-social-app.firebaseapp.com",
+      projectId: "bams-social-app",
+      storageBucket: "bams-social-app.firebasestorage.app",
+      messagingSenderId: "542183068748",
+      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+      measurementId: "G-40MHQ4M0X5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    // Check if user is logged in
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("user-name").innerText = user.displayName;
+        document.getElementById("user-photo").src = user.photoURL;
+      } else {
+        // No user? Redirect to login
+        window.location.href = "index.html";
+      }
+    });
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        localStorage.removeItem("bamsUser");
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>
