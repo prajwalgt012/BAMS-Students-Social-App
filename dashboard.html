@@ -1,54 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>BAMS Social App - Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px;
-      background: #f0fff0;
-    }
-    .profile-pic {
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-    }
-    h2 {
-      color: #2e7d32;
-    }
-    button {
-      margin: 10px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #2e7d32;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00b09b, #96c93d);
       color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .welcome {
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 40px 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .card:hover {
+      border-color: #fff;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .logout-btn {
+      margin: 30px 0;
+      padding: 10px 20px;
+      background: white;
+      color: #333;
       border: none;
       border-radius: 6px;
+      font-weight: bold;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #1b5e20;
+
+    @media (max-width: 600px) {
+      .card-container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h2>Welcome to BAMS Social App</h2>
-  <img id="user-photo" class="profile-pic" src="" alt="User Photo" />
-  <p id="user-name"></p>
+  <header>BAMS Dashboard</header>
 
-  <button onclick="goTo('entertainment.html')">🎬 Entertainment</button>
-  <button onclick="goTo('competition.html')">🏆 Competition</button>
-  <button onclick="logout()">🚪 Logout</button>
+  <div class="welcome" id="welcomeText">Welcome, Student</div>
 
-  <!-- Firebase SDK -->
+  <div class="card-container">
+    <div class="card" onclick="location.href='entertainment.html'">
+      🎉 Entertainment
+    </div>
+    <div class="card" onclick="location.href='quiz.html'">
+      🧠 Daily Quiz
+    </div>
+    <div class="card" onclick="location.href='profile.html'">
+      🙋‍♂️ Profile
+    </div>
+    <div class="card" onclick="logout()">
+      🔓 Logout
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
@@ -62,27 +114,21 @@
 
     firebase.initializeApp(firebaseConfig);
 
-    // Check if user is logged in
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        document.getElementById("user-name").innerText = user.displayName;
-        document.getElementById("user-photo").src = user.photoURL;
+        document.getElementById('welcomeText').innerText = `Welcome, ${user.displayName}`;
       } else {
-        // No user? Redirect to login
         window.location.href = "index.html";
       }
     });
 
-    function goTo(page) {
-      window.location.href = page;
-    }
-
     function logout() {
       firebase.auth().signOut().then(() => {
-        localStorage.removeItem("bamsUser");
+        localStorage.removeItem("user");
         window.location.href = "index.html";
       });
     }
   </script>
+
 </body>
 </html>
