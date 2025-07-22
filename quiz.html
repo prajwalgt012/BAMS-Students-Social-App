@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Quiz - BAMS Social App</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>🧠 Daily Quiz</h1>
+  <button onclick="logout()">Logout</button>
+
+  <div id="quizBox"></div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+      authDomain: "bams-social-app.firebaseapp.com",
+      projectId: "bams-social-app",
+      storageBucket: "bams-social-app.firebasestorage.app",
+      messagingSenderId: "542183068748",
+      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+      measurementId: "G-40MHQ4M0X5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser;
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        currentUser = user;
+        loadQuiz();
+      }
+    });
+
+    function loadQuiz() {
+      const today = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
+
+      db.collection("dailyQuizzes").doc(today).get().then(doc => {
+        if (!doc.exists) {
+          document.getElementById("quizBox").innerHTML = "No quiz for today.";
+          return;
+        }
+
+        const data = doc.data();
+        let optionsHTML = "";
+        data.options.forEach((opt, idx) => {
+          optionsHTML += `
+            <div>
+              <input type="radio" name="option" value="${idx}" id="opt${idx}">
+              <label for="opt${idx}">${opt}</label>
+            </div>`;
+        });
+
+        document.getElementById("quizBox").innerHTML = `
+          <h2>${data.question}</h2>
+          ${optionsHTML}
+          <button onclick="submitAnswer('${today}', ${data.correctAnswer})">Submit Answer</button>
+        `;
+      });
+    }
+
+    function submitAnswer(date, correctAnswer) {
+      const selected = document.querySelector('input[name="option"]:checked');
+      if (!selected) return alert("Please choose an option");
+
+      const userAnswer = parseInt(selected.value);
+      const isCorrect = userAnswer === correctAnswer;
+
+      db.collection("quizResponses").add({
+        user: currentUser.email,
+        date: date,
+        answer: userAnswer,
+        isCorrect: isCorrect,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert(isCorrect ? "✅ Correct Answer!" : "❌ Wrong Answer");
+    }
+
+    function logout() {
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
+  </script>
+</body>
+</html>
