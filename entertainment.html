@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Entertainment - BAMS Social App</title>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { color: #28a745; }
+    input, textarea { display: block; margin: 10px 0; padding: 8px; width: 300px; }
+    img { max-width: 300px; margin-top: 10px; }
+    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<h2>🎭 Entertainment Zone - Share Your Memes</h2>
+
+<!-- Upload Meme -->
+<input type="file" id="imageInput" />
+<textarea id="captionInput" placeholder="Enter caption..."></textarea>
+<button onclick="uploadMeme()">Post Meme</button>
+
+<hr>
+
+<h2>📸 Latest Memes</h2>
+<div id="memeFeed"></div>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+    authDomain: "bams-social-app.firebaseapp.com",
+    projectId: "bams-social-app",
+    storageBucket: "bams-social-app.firebasestorage.app",
+    messagingSenderId: "542183068748",
+    appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+    measurementId: "G-40MHQ4M0X5"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // Upload Meme
+  function uploadMeme() {
+    const file = document.getElementById('imageInput').files[0];
+    const caption = document.getElementById('captionInput').value;
+
+    if (!file || !caption) return alert("Please provide image and caption");
+
+    const storageRef = storage.ref('memes/' + file.name);
+    storageRef.put(file).then(snapshot => {
+      snapshot.ref.getDownloadURL().then(url => {
+        db.collection("memes").add({
+          caption: caption,
+          imageUrl: url,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("Meme posted!");
+          document.getElementById('imageInput').value = '';
+          document.getElementById('captionInput').value = '';
+        });
+      });
+    });
+  }
+
+  // Display Memes
+  db.collection("memes").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+    const feed = document.getElementById("memeFeed");
+    feed.innerHTML = "";
+    snapshot.forEach(doc => {
+      const meme = doc.data();
+      const div = document.createElement("div");
+      div.classList.add("post");
+      div.innerHTML = `
+        <img src="${meme.imageUrl}" />
+        <p>${meme.caption}</p>
+        <small>${meme.timestamp?.toDate().toLocaleString()}</small>
+      `;
+      feed.appendChild(div);
+    });
+  });
+</script>
+
+</body>
+</html>
