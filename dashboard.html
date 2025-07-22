@@ -1,77 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BAMS Social App - Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAMS Dashboard</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #00b09b, #96c93d);
-      color: white;
-      min-height: 100vh;
+      background: #fdfdfd;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     header {
       width: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 20px;
+      padding: 20px 0;
       text-align: center;
+      border-bottom: 1px solid #e0e0e0;
       font-size: 1.8rem;
       font-weight: bold;
+      color: #333;
     }
 
     .welcome {
-      margin-top: 30px;
+      margin: 20px 0;
       font-size: 1.2rem;
+      color: #555;
     }
 
-    .card-container {
+    .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
-      padding: 40px 20px;
+      max-width: 500px;
       width: 100%;
-      max-width: 600px;
     }
 
     .card {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 12px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
       text-align: center;
       cursor: pointer;
-      transition: 0.3s;
-      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      border: 1px solid #f0f0f0;
     }
 
     .card:hover {
-      border-color: #fff;
-      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
 
-    .logout-btn {
-      margin: 30px 0;
-      padding: 10px 20px;
-      background: white;
-      color: #333;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
+    .card span {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 1rem;
+      color: #444;
     }
 
     @media (max-width: 600px) {
-      .card-container {
+      .grid {
         grid-template-columns: 1fr;
       }
     }
@@ -80,55 +86,33 @@
 <body>
 
   <header>BAMS Dashboard</header>
+  <div class="welcome">Welcome, pgtech lab</div>
 
-  <div class="welcome" id="welcomeText">Welcome, Student</div>
-
-  <div class="card-container">
+  <div class="grid">
     <div class="card" onclick="location.href='entertainment.html'">
-      🎉 Entertainment
+      <span>🎉</span>
+      <p>Entertainment</p>
     </div>
     <div class="card" onclick="location.href='quiz.html'">
-      🧠 Daily Quiz
+      <span>🧠</span>
+      <p>Daily Quiz</p>
     </div>
     <div class="card" onclick="location.href='profile.html'">
-      🙋‍♂️ Profile
+      <span>👤</span>
+      <p>Profile</p>
     </div>
     <div class="card" onclick="logout()">
-      🔓 Logout
+      <span>🔓</span>
+      <p>Logout</p>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
-      authDomain: "bams-social-app.firebaseapp.com",
-      projectId: "bams-social-app",
-      storageBucket: "bams-social-app.firebasestorage.app",
-      messagingSenderId: "542183068748",
-      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
-      measurementId: "G-40MHQ4M0X5"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        document.getElementById('welcomeText').innerText = `Welcome, ${user.displayName}`;
-      } else {
-        window.location.href = "index.html";
-      }
-    });
-
     function logout() {
       firebase.auth().signOut().then(() => {
-        localStorage.removeItem("user");
         window.location.href = "index.html";
       });
     }
   </script>
-
 </body>
 </html>
