@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile - BAMS Social App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e6f2ff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #006699;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+    }
+    .profile-container {
+      margin-top: 40px;
+      background: white;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 3px solid #006699;
+    }
+    .info {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #006699;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004466;
+    }
+  </style>
+</head>
+<body>
+  <header>My Profile</header>
+
+  <div class="profile-container">
+    <img id="userPhoto" class="profile-pic" src="" alt="Profile Photo">
+    <div class="info" id="userName">Loading...</div>
+    <div class="info" id="userEmail"></div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJLo6CsZDiYrygv9huk0_BLHmQvkhRxxY",
+      authDomain: "bams-social-app.firebaseapp.com",
+      projectId: "bams-social-app",
+      storageBucket: "bams-social-app.firebasestorage.app",
+      messagingSenderId: "542183068748",
+      appId: "1:542183068748:web:c6beb38679a3026eae10e9",
+      measurementId: "G-40MHQ4M0X5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('userPhoto').src = user.photoURL || 'https://via.placeholder.com/120';
+        document.getElementById('userName').textContent = user.displayName || 'No Name';
+        document.getElementById('userEmail').textContent = user.email;
+      } else {
+        alert('Not logged in');
+        window.location.href = 'index.html';
+      }
+    });
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+  </script>
+</body>
+</html>
